@@ -78,7 +78,7 @@ if uploaded_file_1 and uploaded_file_2:
     result_df.to_excel(output_file, index=False)
     with open(output_file, "rb") as file:
         st.download_button(
-            label="下载结果文件",
+            label="下载文件",
             data=file,
             file_name=output_file,
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
