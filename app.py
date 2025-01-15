@@ -8,16 +8,20 @@ st.title("关键词提取工具")
 # 使用说明
 st.markdown(
     """
-    ### 使用说明
-    1. **原始数据要求**:
-        原始数据须放在原始数据文件第一个sheet的A列中。
+    ##### 使用说明
+    1. **源数据要求**:
+        源数据须放在源数据文件第一个sheet的A列中
     2. **字典和标签要求**:
-        字典和标签须放在字典和标签文件第一个sheet的A列与B列中。
+        字典和标签须放在字典和标签文件第一个sheet的A列与B列中
+    3. **使用场景**：提取源数据列中的菜品或商店名称，比如：从“46龙华麦卡淇蛋糕店”	
+                    提取关键词‘麦卡淇蛋糕’或从“清香西饼屋(上马庄店)”提取关键词‘清香西饼屋’
+    4. **不可缺失列名**
+
     """
 )
 
 # 上传第一个 Excel 文件
-uploaded_file_1 = st.file_uploader("上传原始数据文件", type=["xlsx"])
+uploaded_file_1 = st.file_uploader("上传源数据文件", type=["xlsx"])
 uploaded_file_2 = st.file_uploader("上传字典和标签文件", type=["xlsx"])
 
 if uploaded_file_1 and uploaded_file_2:
