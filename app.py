@@ -1,38 +1,57 @@
 import streamlit as st
 import pandas as pd
+import re
 
 # Streamlit App
 st.title("关键词提取工具")
 
 # 上传第一个 Excel 文件
 uploaded_file_1 = st.file_uploader("上传包含'源'列的 Excel 文件", type=["xlsx"])
-# 上传第二个 Excel 文件
 uploaded_file_2 = st.file_uploader("上传包含'字典'和'标签'列的 Excel 文件", type=["xlsx"])
 
 if uploaded_file_1 and uploaded_file_2:
-
     # 读取文件
     source_df = pd.read_excel(uploaded_file_1, sheet_name=0)
     dict_df = pd.read_excel(uploaded_file_2, sheet_name=0)
 
     # 确保必要的列存在
     if "源" in source_df.columns and "字典" in dict_df.columns and "标签" in dict_df.columns:
-        # 创建一个结果 DataFrame，与 source_df 相同结构，添加空的“字典”和“输出结果”列
+        # 初始化结果 DataFrame
         result_df = source_df.copy()
         result_df["字典"] = None
         result_df["输出结果"] = None
 
-        # 遍历每个源数据，进行匹配
-        for i, source in result_df["源"].items():
-            for _, row in dict_df.iterrows():
-                dictionary, tag = row["字典"], row["标签"]
-                if isinstance(dictionary, str) and dictionary in str(source):
-                    result_df.at[i, "字典"] = dictionary
+        # 构建正则表达式模式
+        pattern = "|".join(re.escape(str(x)) for x in dict_df["字典"] if isinstance(x, str))
+        compiled_pattern = re.compile(pattern)
+
+        # 初始化进度条
+        total_rows = len(result_df)
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+
+        # 分块处理（每次处理 500 行）
+        batch_size = 500
+        for start_row in range(0, total_rows, batch_size):
+            end_row = min(start_row + batch_size, total_rows)
+            batch = result_df.iloc[start_row:end_row]
+
+            # 对当前批次进行匹配
+            for i, source in batch["源"].items():
+                match = compiled_pattern.search(str(source))
+                if match:
+                    matched_keyword = match.group(0)
+                    tag = dict_df.loc[dict_df["字典"] == matched_keyword, "标签"].values[0]
+                    result_df.at[i, "字典"] = matched_keyword
                     result_df.at[i, "输出结果"] = tag
-                    break
+
+            # 更新进度条
+            progress = (end_row / total_rows)
+            progress_bar.progress(progress)
+            status_text.text(f"已处理 {end_row}/{total_rows} 行")
 
         # 显示结果
-        st.write("处理结果：")
+        st.write("处理完成！")
         st.dataframe(result_df)
 
         # 下载结果
