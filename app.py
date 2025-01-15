@@ -40,8 +40,9 @@ if uploaded_file_1 and uploaded_file_2:
     result_df["字典"] = None
     result_df["输出结果"] = None
 
-    # 构建正则表达式模式
-    pattern = "|".join(re.escape(str(x)) for x in dict_df[dictionary_column] if isinstance(x, str))
+    # 构建正则表达式模式，按字典长度降序排列，优先匹配更长的词
+    sorted_dict = sorted(dict_df[dictionary_column], key=lambda x: len(str(x)) if isinstance(x, str) else 0, reverse=True)
+    pattern = "|".join(re.escape(str(x)) for x in sorted_dict if isinstance(x, str))
     compiled_pattern = re.compile(pattern)
 
     # 初始化进度条
@@ -83,4 +84,3 @@ if uploaded_file_1 and uploaded_file_2:
             file_name=output_file,
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
-
