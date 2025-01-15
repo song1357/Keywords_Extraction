@@ -52,7 +52,7 @@ if uploaded_file_1 and uploaded_file_2:
     current_keyword_text = st.empty()
 
     # 分块处理（每次处理 500 行）
-    batch_size = 500
+    batch_size = 1
     for start_row in range(0, total_rows, batch_size):
         end_row = min(start_row + batch_size, total_rows)
         batch = result_df.iloc[start_row:end_row]
