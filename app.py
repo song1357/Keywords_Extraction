@@ -49,10 +49,9 @@ if uploaded_file_1 and uploaded_file_2:
     total_rows = len(result_df)
     progress_bar = st.progress(0)
     status_text = st.empty()
-    current_keyword_text = st.empty()
 
     # 分块处理（每次处理 500 行）
-    batch_size = 1
+    batch_size = 500
     for start_row in range(0, total_rows, batch_size):
         end_row = min(start_row + batch_size, total_rows)
         batch = result_df.iloc[start_row:end_row]
@@ -66,16 +65,10 @@ if uploaded_file_1 and uploaded_file_2:
                 result_df.at[i, "字典"] = matched_keyword
                 result_df.at[i, "输出结果"] = tag
 
-                # 更新当前提取的关键词
-                current_keyword_text.text(f"正在提取关键词：{matched_keyword}")
-
         # 更新进度条
         progress = (end_row / total_rows)
         progress_bar.progress(progress)
         status_text.text(f"已处理 {end_row}/{total_rows} 行")
-
-    # 提取完成状态
-    current_keyword_text.text("已完成提取关键词")
 
     # 显示结果
     st.write("处理完成")
